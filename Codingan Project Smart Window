@@ -1,0 +1,31 @@
+#include <LiquidCrystal.h>
+#include <Servo.h>
+
+#define RS 7
+#define E  6
+#define D4 5
+#define D5 4
+#define D6 3
+#define D7 2
+
+LiquidCrystal lcd(RS, E, D4, D5, D6, D7);
+
+byte degree[] = { 7, 5, 7, 0, 0, 0, 0, 0 };
+
+#define sensorTMP36   A1
+
+void setup() {
+  Serial.begin(9600);
+ 
+  pinMode(pinDC, OUTPUT); //Setting Inisialisasi Sensor Cahaya
+ 
+  //Setting Inisialisasi Sensor Suhu & Output Ke LCD
+  lcd.begin(16, 2);
+  lcd.createChar(0, degree);
+  lcd.clear();
+  lcd.print("Temperature");
+  delay(5000);
+  delline(1);
+ 
+  myservo.attach(9); //Setting Inisialisasi Servo
+}
