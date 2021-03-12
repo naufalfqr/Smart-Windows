@@ -29,3 +29,7 @@ void setup() {
  
   myservo.attach(9); //Setting Inisialisasi Servo
 }
+
+void setup() {
+
+}
