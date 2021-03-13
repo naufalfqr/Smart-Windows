@@ -33,3 +33,48 @@ void setup() {
 void setup() {
 
 }
+//Rumus Hitung Deajat Celcius
+float fmap(long x, long in_min, long in_max, long out_min, long out_max) {
+  return (float)(x - in_min) * (out_max - out_min) / (float)(in_max - in_min) + out_min;
+}
+
+void delline(int line) {
+  lcd.setCursor(0, line);
+  lcd.setCursor(0, line);
+}
+
+
+void loop() {
+  //Proses Sensor Cahaya
+  int nilaiSensor;
+  nilaiSensor = analogRead(sensorLDR);
+ 
+  if(nilaiSensor <=200){
+    digitalWrite(pinDC, HIGH);
+  }else{
+    digitalWrite(pinDC, LOW);
+  }
+  delay(1000);
+ 
+  //Proses Sensor Suhu
+  float C = fmap(((analogRead(sensorTMP36) - 20 ) * 3.04), 0, 1023, -40, 125);
+  Temperature(C);
+ 
+  //Proses Output ke LCD
+  float Celsius    = C;
+  lcd.setCursor(4, 1);
+  delay(250); delline(1);
+  lcd.print(Celsius);
+  lcd.write((byte)0); lcd.print("C  ");
+  lcd.setCursor(9, 1); lcd.print(msg);
+  delay(100); delline(1);
+ 
+  //Proses Setting Servo setelah baca Suhu
+  value = analogRead(A1);
+  angle = map(value, 0, 50, 0, 180);
+  Serial.println(angle);
+  if (value >= 25){
+    myservo.write(angle);                
+    delay(15);
+  }
+}
