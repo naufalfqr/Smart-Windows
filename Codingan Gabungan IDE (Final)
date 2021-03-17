@@ -9,7 +9,6 @@
 #define DHTTYPE DHT11
 
 #define LDR A0
-#define pinDC D5
  
 LiquidCrystal_I2C lcd(0x27, 16, 2); // Alamat I2C, jumlah kolom, jumlah baris
 DHT dht(DHTPIN, DHTTYPE);
@@ -28,7 +27,10 @@ byte derajat[] = {
 int hum = 0, temp = 0;
 
 Servo myservo;
-const int pinDC = 0;
+
+int ENA = 2;
+int IN1 = 14;
+int IN2 = 12;
 
 void setup() {
 #if TAMPIL_SERIAL
@@ -48,6 +50,31 @@ void setup() {
   myservo.attach(0); //D3
   myservo.write(0);
   delay(2000);
+
+  pinMode(ENA, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+}
+
+void motorDC() {
+
+// turn on motors
+  int valDC = analogRead(LDR);  
+  Serial.begin(9600);
+  Serial.println(valDC);  
+  
+  int nilaiSensorDC;
+  nilaiSensorDC = analogRead(LDR);
+
+  if(nilaiSensorDC <=200){
+    digitalWrite(ENA, HIGH);
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+  }
+  else{
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+  }
 }
 
 void loop() {
@@ -99,16 +126,6 @@ void loop() {
   Serial.println(val);  
   delay(1000);
 
-  int nilaiSensor;
-  nilaiSensor = analogRead(LDR);
-
-  if(nilaiSensor <=200){
-    digitalWrite(pinDC, HIGH);
-  }else{
-    digitalWrite(pinDC, LOW);
-  }
-  delay(1000);
-
  if (temp >= 23){
   myservo.write(180);
   delay(1000);
@@ -116,4 +133,6 @@ void loop() {
   myservo.write(0);
   delay(1000);
  }
+
+ motorDC();
 }
