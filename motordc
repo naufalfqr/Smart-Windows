@@ -1,0 +1,38 @@
+int ENA = 2;
+int IN1 = 14;
+int IN2 = 12;
+
+#define LDR A0
+void setup() {
+
+// set all the motor control pins to outputs
+pinMode(ENA, OUTPUT);
+pinMode(IN1, OUTPUT);
+pinMode(IN2, OUTPUT);
+}
+
+void motorDC() {
+
+// turn on motors
+  int val = analogRead(LDR);  
+  Serial.begin(9600);
+  Serial.println(val);  
+  
+  int nilaiSensor;
+  nilaiSensor = analogRead(LDR);
+
+  if(nilaiSensor <=200){
+    digitalWrite(ENA, HIGH);
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+  }
+  else{
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+  }
+}
+
+void loop() {   
+   motorDC();
+   delay (5000); 
+}
