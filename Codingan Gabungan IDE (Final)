@@ -19,7 +19,7 @@ const byte KARAKTER_DERAJAT = 0;
 byte derajat[] = {
   B00111,     //Simbol Derajat
   B00101,     //Simbol Persen
-  B00111,     //Simbol Derajat
+  B00111,     
   B00000,
   B00000,
   B00000,
