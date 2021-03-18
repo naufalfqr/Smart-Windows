@@ -1,17 +1,15 @@
-#include "DHT.h"
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-#include <Servo.h>
+#include "DHT.h"                    //Package Sensor DHT11
+#include <Wire.h>                   //Package untuk komunikasi dengan perangkat I2C
+#include <LiquidCrystal_I2C.h>      //Package penggunaan LCD 16x2 I2C
+#include <Servo.h>                  //Package penggunaan Motor Servo
 
-#define DHTPIN D7
-#define TAMPIL_SERIAL true
-
-#define DHTTYPE DHT11
-
-#define LDR A0
+#define DHTPIN D7                   //Inisialisasi pin Sensor DHT11 (Suhu)
+#define TAMPIL_SERIAL true        
+#define DHTTYPE DHT11               //Inisialisasi Tipe DHT11
+#define LDR A0                      //Inisialisasi pin Sensor LDR 
  
-LiquidCrystal_I2C lcd(0x27, 16, 2); // Alamat I2C, jumlah kolom, jumlah baris
-DHT dht(DHTPIN, DHTTYPE);
+LiquidCrystal_I2C lcd(0x27, 16, 2); //Alamat I2C, jumlah kolom, jumlah baris
+DHT dht(DHTPIN, DHTTYPE);           //Insialisasi Sensor DHT11
 
 const byte KARAKTER_DERAJAT = 0;
 byte derajat[] = {
@@ -24,13 +22,13 @@ byte derajat[] = {
   B00000,
   B00000
 };
-int hum = 0, temp = 0;
 
-Servo myservo;
-
-int ENA = 2;
-int IN1 = 14;
-int IN2 = 12;
+//Pendefinisian Variabel
+int hum = 0, temp = 0;              //Variabel untuk temperatur dan kelembaban
+int ENA = 2;                        //Variabel inisialisasi pin ENA Motor Driver L298N
+int IN1 = 14;                       //Variabel inisialisasi pin IN1 Motor Driver L298N
+int IN2 = 12;                       //Variabel inisialisasi pin IN2 Motor Driver L298N
+Servo myservo;                      //Variabel Servo
 
 void setup() {
 #if TAMPIL_SERIAL
@@ -38,34 +36,54 @@ void setup() {
   Serial.println(F("DHT 11 !"));
 #endif
 
-  lcd.begin();
-  lcd.createChar(KARAKTER_DERAJAT, derajat);
-  lcd.backlight();
-  lcd.setCursor(0, 0);
-  lcd.print("TEMPERATUR :");
-  lcd.setCursor(0, 1);
-  lcd.print("HUMIDITY   :");
+//Setup Bagian LCD 16x2
+lcd.begin();
+lcd.createChar(KARAKTER_DERAJAT, derajat);
+lcd.backlight();
+lcd.setCursor(0, 0);
+lcd.print("TEMPERATUR :");
+lcd.setCursor(0, 1);
+lcd.print("HUMIDITY   :");
 
-  dht.begin();
-  myservo.attach(0); //D3
-  myservo.write(0);
-  delay(2000);
 
-  pinMode(ENA, OUTPUT);
-  pinMode(IN1, OUTPUT);
-  pinMode(IN2, OUTPUT);
+//Perintah memulai Sensor DHT11
+dht.begin();
+
+
+
+//Setup Bagian Motor Servo
+myservo.attach(0);                  //Inisialisasi pin Servo pada pin D3 = 0 dari diagram
+myservo.write(0);                   //Setup perintah penulisan ke Servo
+delay(2000);
+
+
+
+//Setup pin dari Motor Driver L298N untuk Motor DC
+pinMode(ENA, OUTPUT);
+pinMode(IN1, OUTPUT);
+pinMode(IN2, OUTPUT);
 }
 
-void motorDC() {
 
-// turn on motors
-  int valDC = analogRead(LDR);  
+
+
+//Fungsi Khusus Motor DC
+void motorDC() {
+  
+  //Pendeteksian cahaya melalui sensor LDR
+  int valDC = analogRead(LDR);      //Variabel hasil deteksi cahaya  
   Serial.begin(9600);
   Serial.println(valDC);  
-  
+
+
+
+  //Proses cahaya ke output (Motor DC)
   int nilaiSensorDC;
   nilaiSensorDC = analogRead(LDR);
 
+
+
+  //Kondisi proses cahaya ke output
   if(nilaiSensorDC <=200){
     digitalWrite(ENA, HIGH);
     digitalWrite(IN1, HIGH);
@@ -78,18 +96,25 @@ void motorDC() {
 }
 
 void loop() {
-  delay(2000);  // Delay untuk 
-  
+  //Pemanggilan Fungsi Khusus Motor DC
+  motorDC();
+
+
+  //Pendeteksian dari Sensor Suhu (DHT11)
+  delay(2000);
   hum = dht.readHumidity();
-  temp = dht.readTemperature(); // Baca temperatur dalam celcius (default)
+  temp = dht.readTemperature();     // Proses pembacaan temperatur dalam celcius (default)
 
   if (isnan(hum) || isnan(temp)) {
-#if TAMPIL_SERIAL
+  #if TAMPIL_SERIAL
   Serial.println(F("Failed to read from DHT sensor!"));
-#endif
-    return;
+  #endif
+  return;
   }
 
+
+
+  //Pengaturan Penempatan Tulisan di LCD 16x2
   lcd.setCursor(13, 0);
   lcd.print(temp);
   lcd.setCursor(13, 1);
@@ -116,23 +141,27 @@ void loop() {
   }
   lcd.print("%");
   
-#if TAMPIL_SERIAL
+  #if TAMPIL_SERIAL
   Serial.println("\n================");
   Serial.print(F("Temperature: ")); Serial.print(temp); Serial.println(F("°C "));
   Serial.print(F("Humidity: ")); Serial.print(hum); Serial.println("%");
-#endif
+  #endif
 
+
+
+  //Pendeteksian Intensitas Cahaya dari Sensor LDR
   int val = analogRead(LDR);  
   Serial.println(val);  
   delay(1000);
 
- if (temp >= 23){
+
+
+  //Kondisi Pergerakan Servo berdasarkan Sensor Suhu (DHT11)
+  if (temp >= 23){
   myservo.write(180);
   delay(1000);
- }else{
+  }else{
   myservo.write(0);
   delay(1000);
- }
-
- motorDC();
+  }
 }
