@@ -36,6 +36,33 @@ int IN2 = 12;                       //Variabel inisialisasi pin IN2 Motor Driver
 Servo myservo;                      //Variabel Servo
 
 
+//Fungsi Khusus Motor DC
+void motorDC() {
+  
+  //Pendeteksian cahaya melalui sensor LDR
+  int valDC = analogRead(LDR);      //Variabel hasil deteksi cahaya  
+  Serial.begin(9600);
+  Serial.println(valDC);  
+
+
+  //Proses cahaya ke output (Motor DC)
+  int nilaiSensorDC;
+  nilaiSensorDC = analogRead(LDR);
+
+
+  //Kondisi proses cahaya ke output
+  if(nilaiSensorDC <=200){
+    digitalWrite(ENA, 80);      //Speed Control Pin
+    digitalWrite(IN1, HIGH);    //Direction Control Pin (Forward)
+    digitalWrite(IN2, LOW);     //Direction Control Pin (Forward)
+  }
+  else{
+    digitalWrite(IN1, LOW);     //Mematikan Motor DC
+    digitalWrite(IN2, LOW);
+  }
+}
+
+
 void setup() {
 //Kondisional Bersyarat
 #if TAMPIL_SERIAL
@@ -68,33 +95,6 @@ delay(2000);
 pinMode(ENA, OUTPUT);
 pinMode(IN1, OUTPUT);
 pinMode(IN2, OUTPUT);
-}
-
-
-//Fungsi Khusus Motor DC
-void motorDC() {
-  
-  //Pendeteksian cahaya melalui sensor LDR
-  int valDC = analogRead(LDR);      //Variabel hasil deteksi cahaya  
-  Serial.begin(9600);
-  Serial.println(valDC);  
-
-
-  //Proses cahaya ke output (Motor DC)
-  int nilaiSensorDC;
-  nilaiSensorDC = analogRead(LDR);
-
-
-  //Kondisi proses cahaya ke output
-  if(nilaiSensorDC <=200){
-    digitalWrite(ENA, 80);      //Speed Control Pin
-    digitalWrite(IN1, HIGH);    //Direction Control Pin (Forward)
-    digitalWrite(IN2, LOW);     //Direction Control Pin (Forward)
-  }
-  else{
-    digitalWrite(IN1, LOW);     //Mematikan Motor DC
-    digitalWrite(IN2, LOW);
-  }
 }
 
 
@@ -150,7 +150,7 @@ void loop() {
   
 
   //Kondisi Pergerakan Servo berdasarkan Sensor Suhu (DHT11)
-  if (temp >= 23){
+  if (temp >= 25){
   myservo.write(180); //Servo akan berputar 180 derajat
   delay(1000);
   }else{
