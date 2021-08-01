@@ -1,2 +1,4 @@
 # Smart-Windows
-project kelompok 6
+Project Kelompok 6 Rekruitasi Laboratorium Cyber Physical System
+
+Link SKPL Smart Window : https://bit.ly/SKPLSmartWindow
